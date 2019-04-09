@@ -4,9 +4,6 @@ const PORT = 8080; // default port 8080
 app.set('view engine', 'ejs');
 const helpers = require('./functions');
 
-const test = helpers.generateStr();
-console.log(test);
-
 const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com"
@@ -24,16 +21,21 @@ app.get('/urls', (req, res) => {
   res.render('urls_index', templateVars);
 });
 
-app.post("/urls", (req, res) => {
-  console.log(req.body);  // Log the POST request body to the console
-  res.send("Ok");         // Respond with 'Ok' (we will replace this)
+app.post('/urls', (req, res) => {
+  let newShortURL = helpers.generateStr();
+  if(urlDatabase[newShortURL]) {
+    newShortURL = helpers.generateStr();
+  } else {
+    urlDatabase[newShortURL] = req.body.longURL;
+  }
+  res.redirect(`/urls/${newShortURL}`);
 });
 
-app.get("/urls/new", (req, res) => {
+app.get('/urls/new', (req, res) => {
   res.render("urls_new");
 });
 
-app.get("/urls/:shortURL", (req, res) => {
+app.get('/urls/:shortURL', (req, res) => {
   let templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL] };
   res.render("urls_show", templateVars);
 });
