@@ -33,14 +33,19 @@ app.get('/urls', (req, res) => {
   res.render('urls_index', templateVars);
 });
 
-app.post('/urls', (req, res) => {
-  let newShortURL = helpers.generateStr();
-  if(urlDatabase[newShortURL]) {
-    newShortURL = helpers.generateStr();
+app.post('/urls/new', (req, res) => {
+  if(req.body.longURL) {
+    let newShortURL = helpers.generateStr();
+    if(urlDatabase[newShortURL]) {
+      newShortURL = helpers.generateStr();
+    } else {
+      urlDatabase[newShortURL] = req.body.longURL;
+    }
+    res.redirect(`/urls/${newShortURL}`);
   } else {
-    urlDatabase[newShortURL] = req.body.longURL;
+    let templateVars = { username: req.cookies['username']}
+    res.render("urls_new", templateVars);
   }
-  res.redirect(`/urls/${newShortURL}`);
 });
 
 app.post('/login', (req, res) => {
@@ -64,16 +69,24 @@ app.get('/urls/new', (req, res) => {
 });
 
 app.get('/urls/:shortURL', (req, res) => {
-  let templateVars = { username: req.cookies['username'], shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL] };
-  res.render("urls_show", templateVars);
+  if(urlDatabase[req.params.shortURL]) {
+    let templateVars = { username: req.cookies['username'], shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL] };
+    res.render("urls_show", templateVars);
+  } else {
+    res.render("urls_not_found");
+  }
+
 });
 
 app.post('/urls/:shortURL', (req, res) => {
-  urlDatabase[req.params.shortURL] = req.body.longURL;
-  let templateVars = { username: req.cookies['username'], shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL] };
-  res.render("urls_show", templateVars);
-
-})
+  if(req.params.shortURL) {
+    urlDatabase[req.params.shortURL] = req.body.longURL;
+    let templateVars = { username: req.cookies['username'], shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL] };
+    res.render("urls_show", templateVars);
+  } else {
+    res.render("urls_not_found");
+  }
+});
 
 app.get('/urls.json', (req, res) => {
   res.json(urlDatabase);

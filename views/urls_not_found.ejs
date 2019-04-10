@@ -9,20 +9,8 @@
   <title>TinyApp</title>
 </head>
 <body style="font-size:20px; padding:50px;">
-  <% include partials/_header %>
-  <a href='/urls/new'>Create a new TinyURL</a>
-  <h3>My URLs</h3>
-  <% if(urls)  {%>
-    <% for(keyURL in urls) {%>
-      <div>
-        <p><%= keyURL%> - <%= urls[keyURL]%>
-          <a href= "/urls/<%= keyURL%>">Edit</a>
-            <form method="POST" action="/urls/<%-keyURL%>/delete">
-              <button type="submit" class="btn btn-primary">Delete</button>
-            </form>
-        </p>
-      </div>
-    <% } %>
-  <% } %>
+  <div>
+    <h1>Sorry the page you are looking for does not exist! </h1>
+  </div>
 </body>
 </html>
