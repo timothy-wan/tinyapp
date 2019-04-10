@@ -97,6 +97,14 @@ app.post('/register', (req, res) => {
   res.redirect('/urls');
 });
 
+app.get('/login', (req, res) => {
+  let currentUser = req.cookies['user_id'];
+  let templateVars = {
+    user: users[currentUser],
+    urls: urlDatabase };
+  res.render('urls_login', templateVars);
+});
+
 app.post('/login', (req, res) => {
   res.cookie('username', req.body.username);
   res.redirect('/urls');
