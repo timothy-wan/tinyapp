@@ -1,13 +1,13 @@
 <h1>TinyApp</h1>
-<form class="form-inline" action="/login" method="POST">
-  <div class="form-group mb-2">
-    <label for="username">Login to your Account </label>
-    <input class="form-control" type="text" name="username" placeholder="login" style="width: 300px; margin: 1em">
-    <button type="submit" class="btn btn-primary">Submit</button>
-  </div>
-</form>
 <% if(username) { %>
   <p>You are logged in as: <%= username %></p>
 <% } else { %>
+  <form class="form-inline" action="/login" method="POST">
+    <div class="form-group mb-2">
+      <label for="username">Login to your Account </label>
+      <input class="form-control" type="text" name="username" placeholder="username" style="width: 300px; margin: 1em">
+      <button type="submit" class="btn btn-primary">Submit</button>
+    </div>
+  </form>
   <p>You are not logged in!</p>
 <% }%>
