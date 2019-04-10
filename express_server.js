@@ -10,6 +10,19 @@ const urlDatabase = {
   '9sm5xK': 'http://www.google.com'
 };
 
+const users = {
+  'userRandomID': {
+    id: 'userRandomID',
+    email: 'user@example.com',
+    password: 'purple-monkey-dinosaur'
+  },
+ 'user2RandomID': {
+    id: 'user2RandomID',
+    email: 'user2@example.com',
+    password: 'dishwasher-funk'
+  }
+};
+
 const bodyParser = require('body-parser');
 
 app.set('view engine', 'ejs');
@@ -27,6 +40,7 @@ app.get('/u/:shortURL', (req, res) => {
 });
 
 app.get('/urls', (req, res) => {
+  console.log(users);
   let templateVars = {
     username: req.cookies['username'],
     urls: urlDatabase };
@@ -51,6 +65,24 @@ app.post('/urls/new', (req, res) => {
 app.get('/register', (req, res) => {
   let templateVars = { username: req.cookies['username']};
   res.render('urls_registration', templateVars);
+});
+
+app.post('/register', (req, res) => {
+  let newId = helpers.generateStr();
+  let newEmail = req.body.email;
+  let newPassword = req.body.password;
+  if(users[newId]) {
+    newId = helpers.generateStr();
+  } else {
+    users[newId] = {
+      id: newId,
+      email: newEmail,
+      password: newPassword
+
+    }
+    res.cookie('user_id', newId);
+  }
+  res.redirect('/urls');
 });
 
 app.post('/login', (req, res) => {
