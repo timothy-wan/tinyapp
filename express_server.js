@@ -71,16 +71,22 @@ app.post('/register', (req, res) => {
   let newId = helpers.generateStr();
   let newEmail = req.body.email;
   let newPassword = req.body.password;
-  if(users[newId]) {
-    newId = helpers.generateStr();
+  if(!newEmail || !newPassword) {
+    res.sendStatus(400);
+  } else if(helpers.emailCheck(users, newEmail)) {
+    res.sendStatus(400);
   } else {
-    users[newId] = {
-      id: newId,
-      email: newEmail,
-      password: newPassword
+    if(users[newId]) {
+      newId = helpers.generateStr();
+    } else {
+      users[newId] = {
+        id: newId,
+        email: newEmail,
+        password: newPassword
 
+      }
+      res.cookie('user_id', newId);
     }
-    res.cookie('user_id', newId);
   }
   res.redirect('/urls');
 });
