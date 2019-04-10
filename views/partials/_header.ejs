@@ -1,6 +1,11 @@
 <h1>TinyApp</h1>
 <% if(username) { %>
   <p>You are logged in as: <%= username %></p>
+  <form class="form-inline" action="/logout" method="POST">
+    <div class="form-group mb-2">
+      <button type="submit" class="btn btn-primary">Logout</button>
+    </div>
+  </form>
 <% } else { %>
   <form class="form-inline" action="/login" method="POST">
     <div class="form-group mb-2">

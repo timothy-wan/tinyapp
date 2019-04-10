@@ -3,7 +3,6 @@ const app = express();
 const cookieParser = require('cookie-parser');
 const PORT = 8080; // default port 8080
 const morgan = require('morgan');
-app.set('view engine', 'ejs');
 const helpers = require('./functions');
 
 const urlDatabase = {
@@ -12,12 +11,14 @@ const urlDatabase = {
 };
 
 const bodyParser = require('body-parser');
+
+app.set('view engine', 'ejs');
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(cookieParser());
 app.use(morgan('dev'));
 
 app.get('/', (req, res) => {
-  res.send('Hello!');
+  res.redirect('/urls');
 });
 
 app.get('/u/:shortURL', (req, res) => {
@@ -47,6 +48,11 @@ app.post('/login', (req, res) => {
   res.redirect('/urls');
 });
 
+app.post('/logout', (req, res) => {
+  res.clearCookie('username');
+  res.redirect('/urls');
+});
+
 app.post('/urls/:shortURL/delete', (req, res) => {
   delete urlDatabase[req.params.shortURL];
   res.redirect('/urls');
@@ -73,10 +79,6 @@ app.get('/urls.json', (req, res) => {
   res.json(urlDatabase);
 });
 
-app.get('/hello', (req, res) => {
-  res.send('<html><body>Hello <b>World</b></body></html>\n');
-});
-
 app.listen(PORT, () => {
-  console.log(`Example app listening on port ${PORT}!`);
+  console.log(`Tinyapp server listening on port ${PORT}!`);
 });
