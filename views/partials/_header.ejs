@@ -6,7 +6,11 @@
       <button type="submit" class="btn btn-primary">Logout</button>
     </div>
   </form>
-  <a href ="/urls"> Home </a>
+  <div>
+    <a href ="/urls"> URLs </a>
+     |
+    <a href='/urls/new'>Create a new TinyURL</a>
+  </div>
 <% } else { %>
   <form class="form-inline" action="/login" method="POST">
     <div class="form-group mb-2">
@@ -16,5 +20,9 @@
     </div>
   </form>
   <p>You are not logged in!</p>
-  <a href ="/urls"> Home </a>
+  <div>
+    <a href ="/urls"> URLs </a>
+     |
+    <a href='/urls/new'>Create a new TinyURL</a>
+  </div>
 <% }%>

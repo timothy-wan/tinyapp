@@ -48,6 +48,11 @@ app.post('/urls/new', (req, res) => {
   }
 });
 
+app.get('/register', (req, res) => {
+  let templateVars = { username: req.cookies['username']};
+  res.render('urls_registration', templateVars);
+});
+
 app.post('/login', (req, res) => {
   res.cookie('username', req.body.username);
   res.redirect('/urls');
@@ -64,7 +69,7 @@ app.post('/urls/:shortURL/delete', (req, res) => {
 })
 
 app.get('/urls/new', (req, res) => {
-  let templateVars = { username: req.cookies['username']}
+  let templateVars = { username: req.cookies['username']};
   res.render("urls_new", templateVars);
 });
 
@@ -92,6 +97,6 @@ app.get('/urls.json', (req, res) => {
   res.json(urlDatabase);
 });
 
-app.listen(PORT, () => {
+app.listen(PORT,'0.0.0.0', () => {
   console.log(`Tinyapp server listening on port ${PORT}!`);
 });

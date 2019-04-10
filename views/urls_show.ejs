@@ -10,7 +10,6 @@
 </head>
 <body style="font-size:20px; padding:50px;">
   <% include partials/_header %>
-  <a href='/urls/new'>Create a new TinyURL</a>
   <h3>Short URL: <%= shortURL %> for <%= longURL %></h3>
   <form class="form-inline" action="/urls/<%- shortURL%>" method="POST">
       <div class="form-group mb-2">
