@@ -18,7 +18,17 @@ const emailCheck = (object, str) => {
   return false;
 }
 
+const getUserID = (object, str) => {
+  for(let key in object) {
+    if(object[key].email === str) {
+      return key;
+    }
+  }
+  return false;
+}
+
 module.exports = {
   generateStr : generateRandomString,
-  emailCheck : emailCheck
+  emailCheck : emailCheck,
+  getUserID : getUserID
 }

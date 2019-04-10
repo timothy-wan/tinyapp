@@ -77,9 +77,7 @@ app.post('/register', (req, res) => {
   let newId = helpers.generateStr();
   let newEmail = req.body.email;
   let newPassword = req.body.password;
-  if(!newEmail || !newPassword) {
-    res.sendStatus(400);
-  } else if(helpers.emailCheck(users, newEmail)) {
+  if(!newEmail || !newPassword || helpers.emailCheck(users, newEmail)) {
     res.sendStatus(400);
   } else {
     if(users[newId]) {
@@ -106,12 +104,22 @@ app.get('/login', (req, res) => {
 });
 
 app.post('/login', (req, res) => {
-  res.cookie('username', req.body.username);
-  res.redirect('/urls');
+  let loginEmail = req.body.email;
+  let loginPassword = req.body.password;
+  let userID = helpers.getUserID(users, loginEmail);
+  if(!userID) {
+    res.status(403).send('This account does not exist!');
+  } else if (users[userID].password !== loginPassword) {
+    res.status(403).send('You have entered the wrong password');
+  } else {
+    res.cookie('user_id', userID);
+    res.redirect('/urls');
+  }
 });
 
 app.post('/logout', (req, res) => {
-  res.clearCookie('username');
+  console.log()
+  res.clearCookie('user_id');
   res.redirect('/urls');
 });
 
