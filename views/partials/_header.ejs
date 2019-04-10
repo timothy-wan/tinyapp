@@ -1,9 +1,5 @@
 <h1>TinyApp</h1>
-<div>
-  <a href ="/login"> Login </a>
-    |
-  <a href='/register'>Register</a>
-</div>
+
 <% if(user) { %>
   <p>You are logged in as: <%= user.email %></p>
   <form class="form-inline" action="/logout" method="POST">
@@ -17,6 +13,11 @@
     <a href='/urls/new'>Create a new TinyURL</a>
   </div>
 <% } else { %>
+  <div>
+    <a href ="/login"> Login </a>
+      |
+    <a href='/register'>Register</a>
+  </div>
   <p>You are not logged in!</p>
   <div>
     <a href ="/urls"> URLs </a>
