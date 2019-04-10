@@ -129,11 +129,16 @@ app.post('/urls/:shortURL/delete', (req, res) => {
 })
 
 app.get('/urls/new', (req, res) => {
-  let currentUser = req.cookies['user_id'];
-  let templateVars = {
-    user: users[currentUser],
-    urls: urlDatabase };
-  res.render("urls_new", templateVars);
+  if(req.cookies['user_id']) {
+    let currentUser = req.cookies['user_id'];
+    let templateVars = {
+      user: users[currentUser],
+      urls: urlDatabase };
+    res.render("urls_new", templateVars);
+  } else {
+    res.redirect('/login');
+  }
+
 });
 
 app.get('/urls/:shortURL', (req, res) => {
