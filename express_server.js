@@ -1,6 +1,6 @@
 const express = require('express');
 const app = express();
-const cookieParser = require('cookie-parser');
+const cookieSession = require('cookie-session');
 const PORT = 8080; // default port 8080
 const morgan = require('morgan');
 const helpers = require('./functions');
@@ -31,7 +31,9 @@ const bodyParser = require('body-parser');
 
 app.set('view engine', 'ejs');
 app.use(bodyParser.urlencoded({extended: true}));
-app.use(cookieParser());
+app.use(cookieSession({
+  keys: ['user_id']
+}));
 app.use(morgan('dev'));
 
 app.get('/', (req, res) => {
@@ -44,7 +46,7 @@ app.get('/u/:shortURL', (req, res) => {
 });
 
 app.get('/urls', (req, res) => {
-  let currentUser = req.cookies['user_id'];
+  let currentUser = req.session.user_id;
   let userURLs = helpers.urlsForUser(urlDatabase, currentUser);
   let templateVars = {
     user: users[currentUser],
@@ -53,18 +55,18 @@ app.get('/urls', (req, res) => {
 });
 
 app.post('/urls/new', (req, res) => {
-  if(req.cookies['user_id']) {
+  if(req.session.user_id) {
     if(req.body.longURL) {
       let newShortURL = helpers.generateStr();
       if(urlDatabase[newShortURL]) {
         newShortURL = helpers.generateStr();
       } else {
         urlDatabase[newShortURL] = { longURL: req.body.longURL
-          , userID: req.cookies['user_id']}
+          , userID: req.session.user_id}
       }
       res.redirect(`/urls/${newShortURL}`);
     } else {
-      let currentUser = req.cookies['user_id'];
+      let currentUser = req.session.user_id;
       let templateVars = {
         user: users[currentUser],
         urls: urlDatabase };
@@ -76,7 +78,7 @@ app.post('/urls/new', (req, res) => {
 });
 
 app.get('/register', (req, res) => {
-  let currentUser = req.cookies['user_id'];
+  let currentUser = req.session.user_id;
   let templateVars = {
     user: users[currentUser],
     urls: urlDatabase };
@@ -99,14 +101,14 @@ app.post('/register', (req, res) => {
         password: newPassword
 
       }
-      res.cookie('user_id', newId);
+      req.session.user_id = newId;
     }
   }
   res.redirect('/urls');
 });
 
 app.get('/login', (req, res) => {
-  let currentUser = req.cookies['user_id'];
+  let currentUser = req.session.user_id;
   let templateVars = {
     user: users[currentUser],
     urls: urlDatabase };
@@ -122,18 +124,19 @@ app.post('/login', (req, res) => {
   } else if (!bcrypt.compareSync(loginPassword, users[userID].password)) {
     res.status(403).send('You have entered the wrong password');
   } else {
-    res.cookie('user_id', userID);
+    req.session.user_id = userID;
     res.redirect('/urls');
   }
 });
 
 app.post('/logout', (req, res) => {
-  res.clearCookie('user_id');
+  res.clearCookie('express:sess');
+  res.clearCookie('express:sess.sig');
   res.redirect('/urls');
 });
 
 app.post('/urls/:shortURL/delete', (req, res) => {
-  if(urlDatabase[req.params.shortURL === req.cookies['user_id']]) {
+  if(urlDatabase[req.params.shortURL === req.session.user_id]) {
     delete urlDatabase[req.params.shortURL];
     res.redirect('/urls');
   } else {
@@ -142,8 +145,8 @@ app.post('/urls/:shortURL/delete', (req, res) => {
 });
 
 app.get('/urls/new', (req, res) => {
-  if(req.cookies['user_id']) {
-    let currentUser = req.cookies['user_id'];
+  if(req.session.user_id) {
+    let currentUser = req.session.user_id;
     let templateVars = {
       user: users[currentUser],
       urls: urlDatabase };
@@ -156,8 +159,7 @@ app.get('/urls/new', (req, res) => {
 
 app.get('/urls/:shortURL', (req, res) => {
   if(urlDatabase[req.params.shortURL]) {
-    console.log(urlDatabase);
-    let currentUser = req.cookies['user_id'];
+    let currentUser = req.session.user_id;
     let templateVars = {
       user: users[currentUser],
       shortURL: req.params.shortURL,
@@ -172,8 +174,7 @@ app.get('/urls/:shortURL', (req, res) => {
 
 app.post('/urls/:shortURL', (req, res) => {
   if(req.params.shortURL) {
-    let currentUser = req.cookies['user_id'];
-    console.log(urlDatabase[req.params.shortURL].userID);
+    let currentUser = req.session.user_id;
     if(currentUser === urlDatabase[req.params.shortURL].userID) {
       urlDatabase[req.params.shortURL].longURL = req.body.longURL;
       let templateVars = {
