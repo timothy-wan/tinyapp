@@ -10,13 +10,17 @@
 </head>
 <body style="font-size:20px; padding:50px;">
   <% include partials/_header %>
-  <h3>Short URL: <%= shortURL %> for <%= longURL %></h3>
-  <form class="form-inline" action="/urls/<%- shortURL%>" method="POST">
+  <% if(user && user.id === userID) { %>
+    <h3>Short URL: <%= shortURL %> for <%= longURL %>  <%= userID%></h3>
+    <form class="form-inline" action="/urls/<%- shortURL%>" method="POST">
       <div class="form-group mb-2">
         <label for="longURL">Enter a URL to remap to shortURL: </label>
         <input class="form-control" type="text" name="longURL" placeholder="http://" style="width: 300px; margin: 1em">
         <button type="submit" class="btn btn-primary">Submit</button>
-      </div>
+        </div>
     </form>
+  <% } else if(user && user.id !== userID)  {%>
+    <h3> This is not your shortURL. You cannot edit this shortURL.<h3>
+  <% } %>
 </body>
 </html>

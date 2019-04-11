@@ -27,8 +27,19 @@ const getUserID = (object, str) => {
   return false;
 }
 
+const urlsForUser = (object, id) => {
+  let matches = {};
+  for(let key in object) {
+    if(object[key].userID === id) {
+      matches[key] = object[key];
+    }
+  }
+  return matches;
+}
+
 module.exports = {
   generateStr : generateRandomString,
   emailCheck : emailCheck,
-  getUserID : getUserID
+  getUserID : getUserID,
+  urlsForUser : urlsForUser
 }

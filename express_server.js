@@ -6,20 +6,20 @@ const morgan = require('morgan');
 const helpers = require('./functions');
 
 const urlDatabase = {
-  'b2xVn2': 'http://www.lighthouselabs.ca',
-  '9sm5xK': 'http://www.google.com'
+  'b2xVn2': {longURL: 'http://www.lighthouselabs.ca', userID: 'userRandomID'},
+  '9sm5xK': {longURL: 'http://www.google.com', userID: 'userRandomID'}
 };
 
 const users = {
   'userRandomID': {
     id: 'userRandomID',
     email: 'user@example.com',
-    password: 'purple-monkey-dinosaur'
+    password: '1'
   },
  'user2RandomID': {
     id: 'user2RandomID',
     email: 'user2@example.com',
-    password: 'dishwasher-funk'
+    password: '2'
   }
 };
 
@@ -41,27 +41,33 @@ app.get('/u/:shortURL', (req, res) => {
 
 app.get('/urls', (req, res) => {
   let currentUser = req.cookies['user_id'];
+  let userURLs = helpers.urlsForUser(urlDatabase, currentUser);
   let templateVars = {
     user: users[currentUser],
-    urls: urlDatabase };
+    urls: userURLs };
   res.render('urls_index', templateVars);
 });
 
 app.post('/urls/new', (req, res) => {
-  if(req.body.longURL) {
-    let newShortURL = helpers.generateStr();
-    if(urlDatabase[newShortURL]) {
-      newShortURL = helpers.generateStr();
+  if(req.cookies['user_id']) {
+    if(req.body.longURL) {
+      let newShortURL = helpers.generateStr();
+      if(urlDatabase[newShortURL]) {
+        newShortURL = helpers.generateStr();
+      } else {
+        urlDatabase[newShortURL] = { longURL: req.body.longURL
+          , userID: req.cookies['user_id']}
+      }
+      res.redirect(`/urls/${newShortURL}`);
     } else {
-      urlDatabase[newShortURL] = req.body.longURL;
+      let currentUser = req.cookies['user_id'];
+      let templateVars = {
+        user: users[currentUser],
+        urls: urlDatabase };
+      res.render("urls_new", templateVars);
     }
-    res.redirect(`/urls/${newShortURL}`);
   } else {
-    let currentUser = req.cookies['user_id'];
-    let templateVars = {
-      user: users[currentUser],
-      urls: urlDatabase };
-    res.render("urls_new", templateVars);
+    res.status(403).send('Please register or login before trying to add a new URL');
   }
 });
 
@@ -118,15 +124,18 @@ app.post('/login', (req, res) => {
 });
 
 app.post('/logout', (req, res) => {
-  console.log()
   res.clearCookie('user_id');
   res.redirect('/urls');
 });
 
 app.post('/urls/:shortURL/delete', (req, res) => {
-  delete urlDatabase[req.params.shortURL];
-  res.redirect('/urls');
-})
+  if(urlDatabase[req.params.shortURL === req.cookies['user_id']]) {
+    delete urlDatabase[req.params.shortURL];
+    res.redirect('/urls');
+  } else {
+    res.status(403).send("You do not own this shortURL");
+  }
+});
 
 app.get('/urls/new', (req, res) => {
   if(req.cookies['user_id']) {
@@ -143,11 +152,13 @@ app.get('/urls/new', (req, res) => {
 
 app.get('/urls/:shortURL', (req, res) => {
   if(urlDatabase[req.params.shortURL]) {
+    console.log(urlDatabase);
     let currentUser = req.cookies['user_id'];
     let templateVars = {
       user: users[currentUser],
       shortURL: req.params.shortURL,
-      longURL: urlDatabase[req.params.shortURL] };
+      longURL: urlDatabase[req.params.shortURL].longURL,
+      userID: urlDatabase[req.params.shortURL].userID };
     res.render("urls_show", templateVars);
   } else {
     res.render("urls_not_found");
@@ -158,11 +169,18 @@ app.get('/urls/:shortURL', (req, res) => {
 app.post('/urls/:shortURL', (req, res) => {
   if(req.params.shortURL) {
     let currentUser = req.cookies['user_id'];
-    let templateVars = {
-      user: users[currentUser],
-      shortURL: req.params.shortURL,
-      longURL: urlDatabase[req.params.shortURL] };
-    res.render("urls_show", templateVars);
+    console.log(urlDatabase[req.params.shortURL].userID);
+    if(currentUser === urlDatabase[req.params.shortURL].userID) {
+      urlDatabase[req.params.shortURL].longURL = req.body.longURL;
+      let templateVars = {
+        user: users[currentUser],
+        shortURL: req.params.shortURL,
+        longURL: urlDatabase[req.params.shortURL].longURL,
+        userID: urlDatabase[req.params.shortURL].userID };
+      res.render("urls_show", templateVars);
+    } else {
+      res.status(403).send('You are not the owner of the short URL');
+    }
   } else {
     res.render("urls_not_found");
   }

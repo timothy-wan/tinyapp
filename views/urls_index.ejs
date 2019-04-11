@@ -10,17 +10,19 @@
 </head>
 <body style="font-size:20px; padding:50px;">
   <% include partials/_header %>
-  <h3>My URLs</h3>
-  <% if(urls)  {%>
-    <% for(keyURL in urls) {%>
-      <div>
-        <p><%= keyURL%> - <%= urls[keyURL]%>
-          <a href= "/urls/<%= keyURL%>">Edit</a>
-            <form method="POST" action="/urls/<%-keyURL%>/delete">
-              <button type="submit" class="btn btn-primary">Delete</button>
-            </form>
-        </p>
-      </div>
+  <% if(user) {%>
+    <h3>My URLs</h3>
+    <% if(urls)  {%>
+      <% for(keyURL in urls) {%>
+        <div>
+          <p><%= keyURL%> - <%= urls[keyURL].longURL%>
+            <a href= "/urls/<%= keyURL%>">Edit</a>
+              <form method="POST" action="/urls/<%-keyURL%>/delete">
+                <button type="submit" class="btn btn-primary">Delete</button>
+              </form>
+          </p>
+        </div>
+      <% } %>
     <% } %>
   <% } %>
 </body>
