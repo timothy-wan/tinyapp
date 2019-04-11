@@ -4,22 +4,26 @@ const cookieParser = require('cookie-parser');
 const PORT = 8080; // default port 8080
 const morgan = require('morgan');
 const helpers = require('./functions');
+const bcrypt = require('bcrypt');
 
 const urlDatabase = {
   'b2xVn2': {longURL: 'http://www.lighthouselabs.ca', userID: 'userRandomID'},
   '9sm5xK': {longURL: 'http://www.google.com', userID: 'userRandomID'}
 };
 
+const testPass1 = bcrypt.hashSync('1', 10);
+const testPass2 = bcrypt.hashSync('2', 10);
+
 const users = {
   'userRandomID': {
     id: 'userRandomID',
     email: 'user@example.com',
-    password: '1'
+    password: testPass1
   },
  'user2RandomID': {
     id: 'user2RandomID',
     email: 'user2@example.com',
-    password: '2'
+    password: testPass2
   }
 };
 
@@ -82,7 +86,7 @@ app.get('/register', (req, res) => {
 app.post('/register', (req, res) => {
   let newId = helpers.generateStr();
   let newEmail = req.body.email;
-  let newPassword = req.body.password;
+  let newPassword = bcrypt.hashSync(req.body.password, 10);
   if(!newEmail || !newPassword || helpers.emailCheck(users, newEmail)) {
     res.sendStatus(400);
   } else {
@@ -115,7 +119,7 @@ app.post('/login', (req, res) => {
   let userID = helpers.getUserID(users, loginEmail);
   if(!userID) {
     res.status(403).send('This account does not exist!');
-  } else if (users[userID].password !== loginPassword) {
+  } else if (!bcrypt.compareSync(loginPassword, users[userID].password)) {
     res.status(403).send('You have entered the wrong password');
   } else {
     res.cookie('user_id', userID);
