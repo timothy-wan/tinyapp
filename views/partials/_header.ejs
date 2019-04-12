@@ -1,23 +1,30 @@
-<h1>TinyApp</h1>
-
-<% if(user) { %>
-  <p>You are logged in as: <%= user.email %></p>
-  <form class="form-inline" action="/logout" method="POST">
+<div class='px-5 m-0 bg-dark border rounded-pill float-left clearfix'>
+  <h1 class='text-light align-middle'>TinyApp</h1>
+</div>
+<ul class="nav justify-content-center">
+  <li class="nav-item">
+    <a class="nav-link active" href="/urls">Home</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" href="/urls/new">Create URL</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" href="/login">Login</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" href="/register">Register</a>
+  </li>
+  <% if(user) { %>
+    <li class="nav-item">
+      <form class="form-inline" action="/logout" method="POST">
     <div class="form-group mb-2">
       <button type="submit" class="btn btn-primary">Logout</button>
     </div>
-  </form>
-  <div>
-    <a href ="/urls"> URLs </a>
-     |
-    <a href='/urls/new'>Create a new TinyURL</a>
-  </div>
-<% } else { %>
-  <div>
-    <a href ="/login"> Login </a>
-      |
-    <a href='/register'>Register</a>
-  </div>
-  <p>You are not logged in!</p>
-  <p>Please register or login to shorten any URLs</p>
-<% }%>
+      </form>
+    </li>
+
+  <% } %>
+</ul>
+
+<div class="d-block p-2 m-5 bg-dark">
+</div>

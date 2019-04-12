@@ -10,20 +10,33 @@
 </head>
 <body style="font-size:20px; padding:50px;">
   <% include partials/_header %>
-  <% if(user) {%>
-    <h3>My URLs</h3>
-    <% if(urls)  {%>
-      <% for(keyURL in urls) {%>
-        <div>
-          <p><%= keyURL%> - <%= urls[keyURL].longURL%>
-            <a href= "/urls/<%= keyURL%>">Edit</a>
-              <form method="POST" action="/urls/<%-keyURL%>/delete">
-                <button type="submit" class="btn btn-primary">Delete</button>
+  <% if(user) { %>
+    <div>
+      <h2>Hello <%= user.email %>! </h2>
+    </div>
+    <div class='px-5 m-0 bg-light border rounded float-center text-center clearfix'>
+      <h3>My URLs</h3>
+    </div>
+    <div class="shadow p-3 mb-5 bg-white rounded p-5 m-5">
+      <% if(urls)  { %>
+      <% for(keyURL in urls) { %>
+          <div class="card col-lg-10" style="width: 18rem;">
+            <div class="card-body m-0">
+              <a href="./u/<%= keyURL %>" class="card-title" > <%= keyURL %> </a>
+              <h6 class="card-subtitle mb-2 text-muted">Mapped to <%= urls[keyURL].longURL%></h6>
+              <a href="/urls/<%= keyURL%>" class="card-link col-lg 6">Edit</a>
+              <form class="card-link" method="POST" action="/urls/<%=keyURL%>/delete">
+                  <button type="submit" class="btn btn-primary col-lg-6">Delete</button>
               </form>
-          </p>
-        </div>
+           </div>
+          </div>
       <% } %>
-    <% } %>
+    </div>
+  <% } %>
+  <% } else { %>
+    <div class="shadow p-3 mb-5 bg-white rounded p-5 m-5">
+      <p>Please register or log in to your account to view or create new URLs</p>
+    </div>
   <% } %>
 </body>
 </html>

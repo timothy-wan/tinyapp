@@ -11,7 +11,8 @@
 <body style="font-size:20px; padding:50px;">
   <% include partials/_header %>
   <% if(user && user.id === userID) { %>
-    <h3>Short URL: <%= shortURL %> for <%= longURL %></h3>
+  <div class='px-5 m-4 bg-light border rounded float-center clearfix'>
+    <h3>Short URL: <a href="../u/<%= shortURL %>"> u/<%= shortURL %> </a>for <%= longURL %></h3>
     <form class="form-inline" action="/urls/<%- shortURL%>" method="POST">
       <div class="form-group mb-2">
         <label for="longURL">Enter a URL to remap to shortURL: </label>
@@ -19,8 +20,15 @@
         <button type="submit" class="btn btn-primary">Submit</button>
         </div>
     </form>
+  </div>
   <% } else if(user && user.id !== userID)  {%>
-    <h3> This is not your shortURL. You cannot edit this shortURL.<h3>
+    <div class="shadow p-3 mb-5 bg-white rounded p-5 m-5">
+      <h3> This is not your shortURL. You cannot edit this shortURL.</h3>
+    </div>
+  <% } else { %>
+    <div class="shadow p-3 mb-5 bg-white rounded p-5 m-5">
+      <p>Please register or log in to your account to view or create new URLs</p>
+    </div>
   <% } %>
 </body>
 </html>

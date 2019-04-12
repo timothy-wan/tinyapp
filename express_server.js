@@ -56,13 +56,14 @@ app.get('/urls', (req, res) => {
 
 app.post('/urls/new', (req, res) => {
   if(req.session.user_id) {
-    if(req.body.longURL) {
+    if(req.body.longURL) {                    //make sure user is logged in and received input
       let newShortURL = helpers.generateStr();
-      if(urlDatabase[newShortURL]) {
+      if(urlDatabase[newShortURL]) {          //make sure there isnt an existing short URL with the same random string
         newShortURL = helpers.generateStr();
       } else {
-        urlDatabase[newShortURL] = { longURL: req.body.longURL
-          , userID: req.session.user_id}
+        urlDatabase[newShortURL] = {
+          longURL: req.body.longURL,
+          userID: req.session.user_id}
       }
       res.redirect(`/urls/${newShortURL}`);
     } else {
@@ -86,11 +87,16 @@ app.get('/register', (req, res) => {
 });
 
 app.post('/register', (req, res) => {
+  let currentUser = req.session.user_id;
+  let templateVars = {
+    user: users[currentUser] };
   let newId = helpers.generateStr();
   let newEmail = req.body.email;
   let newPassword = bcrypt.hashSync(req.body.password, 10);
-  if(!newEmail || !newPassword || helpers.emailCheck(users, newEmail)) {
-    res.sendStatus(400);
+  if(!newEmail || !newPassword) {
+    res.render('urls_empty_fields', templateVars);
+  } else if(helpers.emailCheck(users, newEmail)) {
+    res.render('urls_email', templateVars);
   } else {
     if(users[newId]) {
       newId = helpers.generateStr();
@@ -116,13 +122,16 @@ app.get('/login', (req, res) => {
 });
 
 app.post('/login', (req, res) => {
+  let currentUser = req.session.user_id;
   let loginEmail = req.body.email;
   let loginPassword = req.body.password;
+  let templateVars = {
+      user: users[currentUser] };
   let userID = helpers.getUserID(users, loginEmail);
   if(!userID) {
-    res.status(403).send('This account does not exist!');
+    res.render('urls_no_account', templateVars);
   } else if (!bcrypt.compareSync(loginPassword, users[userID].password)) {
-    res.status(403).send('You have entered the wrong password');
+    res.render('urls_input_error', templateVars);
   } else {
     req.session.user_id = userID;
     res.redirect('/urls');
@@ -136,7 +145,8 @@ app.post('/logout', (req, res) => {
 });
 
 app.post('/urls/:shortURL/delete', (req, res) => {
-  if(urlDatabase[req.params.shortURL === req.session.user_id]) {
+  console.log(urlDatabase[req.params.shortURL]);
+  if(urlDatabase[req.params.shortURL].getUserID === req.session.user_id) {
     delete urlDatabase[req.params.shortURL];
     res.redirect('/urls');
   } else {
@@ -167,7 +177,11 @@ app.get('/urls/:shortURL', (req, res) => {
       userID: urlDatabase[req.params.shortURL].userID };
     res.render("urls_show", templateVars);
   } else {
-    res.render("urls_not_found");
+    let currentUser = req.session.user_id;
+    let templateVars = {
+        user: users[currentUser]
+    };
+    res.render("urls_not_found", templateVars);
   }
 
 });
@@ -187,7 +201,11 @@ app.post('/urls/:shortURL', (req, res) => {
       res.status(403).send('You are not the owner of the short URL');
     }
   } else {
-    res.render("urls_not_found");
+    let currentUser = req.session.user_id;
+    let templateVars = {
+        user: users[currentUser]
+    };
+    res.render("urls_not_found", templateVars);
   }
 });
 

@@ -12,7 +12,8 @@
 
   <body style="font-size:20px; padding:50px;">
     <% include partials/_header %>
-    <div>
+    <% if(!user) { %>
+    <div class="shadow p-3 mb-5 bg-white rounded p-5 m-5">
       <h2> Login to Your Account </h2>
        <form action="/login" method="POST">
         <div class="form-group">
@@ -24,5 +25,10 @@
         </div>
       </form>
     </div>
+  <% } else { %>
+    <div class="shadow p-3 mb-5 bg-white rounded p-5 m-5">
+      <p>You are already logged in as <%= user.email %>! Please logout if you wish to switch accounts!</p>
+    </div>
+  <% } %>
   </body>
 </html>
