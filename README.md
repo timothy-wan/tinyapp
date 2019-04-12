@@ -60,37 +60,37 @@ TinyApp is a full stack web application built with Node and Express that allows 
 #### GET /urls/new
 - if user is logged in:
   - returns HTML with:
-    - the site header (see Display Requirements above)
+    - the site header (see Display Requirements above) ✔
 - a form which contains:
-  - a text input field for the original (long) URL
-  - a submit button which makes a POST request to /urls
+  - a text input field for the original (long) URL ✔
+  - a submit button which makes a POST request to /urls ✔
 - if user is not logged in:
-  - redirects to the /login page
+  - redirects to the /login page ✔
 
 #### GET /urls/:id
 - if user is logged in and owns the URL for the given ID:
-  returns HTML with:
-  the site header (see Display Requirements above)
-  the short URL (for the given ID)
+  - returns HTML with:
+    - the site header (see Display Requirements above) ✔
+    - the short URL (for the given ID) ✔
 - a form which contains:
-  the corresponding long URL
-- an update button which makes a POST request to /urls/:id
+    - the corresponding long URL ✔
+- an update button which makes a POST request to /urls/:id ✔
 - (Stretch) the date the short URL was created
 - (Stretch) the number of times the short URL was visited
 - (Stretch) the number of unique visits for the short URL
 - if a URL for the given ID does not exist:
-  (Minor) returns HTML with a relevant error message
+  - (Minor) returns HTML with a relevant error message ✔
 - if user is not logged in:
-  returns HTML with a relevant error message
+  - returns HTML with a relevant error message ✔
 - if user is logged it but does not own the URL with the given ID:
-  returns HTML with a relevant error message
+  - returns HTML with a relevant error message ✔
 
 #### GET /u/:id
 
 - if URL for the given ID exists:
-  redirects to the corresponding long URL
+  - redirects to the corresponding long URL ✔
 - if URL for the given ID does not exist:
-- (Minor) returns HTML with a relevant error message
+  - (Minor) returns HTML with a relevant error message ✔
 
 #### POST /urls
 
