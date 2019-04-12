@@ -17,16 +17,16 @@
     <div class="shadow p-3 mb-5 bg-white rounded p-5 m-5">
       <% if(urls)  { %>
       <% for(keyURL in urls) { %>
-          <div class="card border-0 d-inline col-lg-6">
-            <div class="card-body">
-              <a href="./u/<%= keyURL %>" class="card-title" > <%= keyURL %> </a>
-              <h6 class="card-subtitle mb-2 text-muted">Mapped to <%= urls[keyURL].longURL%></h6>
-              <a href="/urls/<%= keyURL%>" class="card-link d-inline">Edit</a>
-              <form class="card-link" method="POST" action="/urls/<%=keyURL%>/delete">
-                  <button type="submit" class="btn btn-primary d-inline">Delete</button>
-              </form>
-           </div>
+        <div class="card d-inline border-0" style="width: 6rem;">
+          <div class="card-body">
+            <a href="./u/<%= keyURL %>" class="card-title" > <%= keyURL %> </a>
+            <h6 class="card-subtitle mb-2 m-1 p-1 text-muted">Mapped to <%= urls[keyURL].longURL%></h6>
+            <a href="/urls/<%= keyURL%>" class="card-link d-inline">Edit</a>
+            <form class="card-link d-inline" method="POST" action="/urls/<%=keyURL%>/delete">
+                <button type="submit" class="btn btn-primary d-inline">Delete</button>
+            </form>
           </div>
+        </div>
       <% } %>
     </div>
   <% } %>
