@@ -7,8 +7,24 @@ const morgan = require('morgan');
 const helpers = require('./functions');
 const bcrypt = require('bcrypt');
 
-const urlDatabase = {};
-const users = {};
+const urlDatabase = {
+  /*
+    shortURL: {
+      longURL :,
+      userID :,
+    }
+  */
+};
+
+const users = {
+  /*
+    user: {
+      id:,
+      email:,
+      password:
+    }
+  */
+};
 
 const bodyParser = require('body-parser');
 

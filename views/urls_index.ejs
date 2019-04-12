@@ -14,10 +14,10 @@
     <div class='px-5 m-0 bg-light border rounded float-center text-center clearfix'>
       <h3>My URLs</h3>
     </div>
-    <div class="shadow p-3 mb-5 bg-white rounded p-5 m-5">
       <% if(urls)  { %>
       <% for(keyURL in urls) { %>
-        <div class="card d-inline border-0" style="width: 6rem;">
+      <div class="shadow p-3 mb-5 bg-white rounded float-center p-2 m-2 col-m-6 text-center">
+        <div class="card d-inline border-0 col" style="width: 6rem;">
           <div class="card-body">
             <a href="./u/<%= keyURL %>" class="card-title" > <%= keyURL %> </a>
             <h6 class="card-subtitle mb-2 m-1 p-1 text-muted">Mapped to <%= urls[keyURL].longURL%></h6>
@@ -27,6 +27,7 @@
             </form>
           </div>
         </div>
+      </div>
       <% } %>
     </div>
   <% } %>
