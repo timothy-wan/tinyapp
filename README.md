@@ -42,8 +42,8 @@ TinyApp is a full stack web application built with Node and Express that allows 
 
 #### GET /urls
 - if user is logged in:
-  returns HTML with:
-  the site header (see Display Requirements above) ✔
+-- returns HTML with:
+--- the site header (see Display Requirements above) ✔
 - a list (or table) of URLs the user has created, each list item containing:
   a short URL ✔
   the short URL's matching long URL ✔
