@@ -26,11 +26,11 @@ TinyApp is a full stack web application built with Node and Express that allows 
 ### Site Header:
 
 - if a user is logged in, the header shows:
-  the user's email
-- a logout button which makes a POST request to /logout
-- if a user is not logged in, the header shows:
-  a link to the login page (/login)
-  a link to the registration page (/register)
+  the user's email ✔
+- a logout button which makes a POST request to /logout ✔
+- if a user is not logged in, the header shows: ✔
+  a link to the login page (/login) ✔
+  a link to the registration page (/register) ✔
 
 ### Behaviour Requirements
 #### GET /
