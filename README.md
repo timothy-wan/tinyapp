@@ -33,14 +33,14 @@ TinyApp is a full stack web application built with Node and Express that allows 
   a link to the registration page (/register)
 
 ### Behaviour Requirements
-####GET /
+#### GET /
 
 - if user is logged in:
   (Minor) redirect to /urls
 - if user is not logged in:
   (Minor) redirect to /login
 
-####GET /urls
+#### GET /urls
 - if user is logged in:
   returns HTML with:
   the site header (see Display Requirements above)
@@ -57,7 +57,7 @@ TinyApp is a full stack web application built with Node and Express that allows 
 - if user is not logged in:
   returns HTML with a relevant error message
 
-####GET /urls/new
+#### GET /urls/new
 - if user is logged in:
   returns HTML with:
   the site header (see Display Requirements above)
@@ -67,7 +67,7 @@ TinyApp is a full stack web application built with Node and Express that allows 
 - if user is not logged in:
   redirects to the /login page
 
-####GET /urls/:id
+#### GET /urls/:id
 - if user is logged in and owns the URL for the given ID:
   returns HTML with:
   the site header (see Display Requirements above)
