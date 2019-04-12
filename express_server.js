@@ -13,24 +13,30 @@ const users = {};
 const bodyParser = require('body-parser');
 
 app.set('view engine', 'ejs');
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(cookieSession( {
+app.use(bodyParser.urlencoded({
+  extended: true
+}));
+app.use(cookieSession({
   keys: ['user_id']
 }));
 app.use(morgan('dev'));
 
 // takes client to home page ('/urls')
 app.get('/', (req, res) => {
-  res.redirect('/urls');
+  if(req.session.user_id) {
+    res.redirect('/urls');
+  } else {
+    res.redirect('/login');
+  }
 });
 
 // redirects the client to the longURL
 app.get('/u/:shortURL', (req, res) => {
   let currentUser = req.session.user_id;
   let templateVars = {
-    user : users[currentUser]
+    user: users[currentUser]
   }
-  if(urlDatabase[req.params.shortURL]) {
+  if (urlDatabase[req.params.shortURL]) {
     const longURL = urlDatabase[req.params.shortURL].longURL;
     res.redirect(longURL);
   } else {
@@ -46,31 +52,34 @@ app.get('/urls', (req, res) => {
   let userURLs = helpers.urlsForUser(urlDatabase, currentUser);
   let templateVars = {
     user: users[currentUser],
-    urls: userURLs };
+    urls: userURLs
+  };
   res.render('urls_index', templateVars);
 });
 
 // creates a new short url on post request if the user is logged in, if posting without user auth, redirects back to /urls to tell user to log in
 app.post('/urls/new', (req, res) => {
-  if(req.session.user_id) {
+  if (req.session.user_id) {
     // make sure user is logged in and received input
-    if(req.body.longURL) {
+    if (req.body.longURL) {
       // generateStr() returns a 6 length string that was randomly generated
       let newShortURL = helpers.generateStr();
       // make sure there isnt an existing short URL with the same random string
-      if(urlDatabase[newShortURL]) {
+      if (urlDatabase[newShortURL]) {
         newShortURL = helpers.generateStr();
       } else {
         urlDatabase[newShortURL] = {
           longURL: req.body.longURL,
-          userID: req.session.user_id };
+          userID: req.session.user_id
+        };
       }
       res.redirect(`/urls/${newShortURL}`);
     } else {
       let currentUser = req.session.user_id;
       let templateVars = {
         user: users[currentUser],
-        urls: urlDatabase };
+        urls: urlDatabase
+      };
       res.render("urls_new", templateVars);
     }
   } else {
@@ -83,7 +92,8 @@ app.get('/register', (req, res) => {
   let currentUser = req.session.user_id;
   let templateVars = {
     user: users[currentUser],
-    urls: urlDatabase };
+    urls: urlDatabase
+  };
   res.render('urls_registration', templateVars);
 });
 
@@ -91,29 +101,29 @@ app.get('/register', (req, res) => {
 app.post('/register', (req, res) => {
   let currentUser = req.session.user_id;
   let templateVars = {
-    user: users[currentUser] };
+    user: users[currentUser]
+  };
   let newId = helpers.generateStr();
   let newEmail = req.body.email;
   let newPassword = bcrypt.hashSync(req.body.password, 10);
   // make sure some input is received
-  if(!newEmail || !newPassword) {
-  //
+  if (!newEmail || !newPassword) {
+    //
     res.render('urls_empty_fields', templateVars);
-  // renders the email error page if an prior account with same email is found
-  // emailCheck returns boolean value to check if entered email is already in user database
-  } else if(helpers.emailCheck(users, newEmail)) {
+    // renders the email error page if an prior account with same email is found
+    // emailCheck returns boolean value to check if entered email is already in user database
+  } else if (helpers.emailCheck(users, newEmail)) {
     res.render('urls_email', templateVars);
   } else {
-  // make sure there isn't duplicate user ids
-    if(users[newId]) {
+    // make sure there isn't duplicate user ids
+    if (users[newId]) {
       newId = helpers.generateStr();
     } else {
       users[newId] = {
         id: newId,
         email: newEmail,
         password: newPassword
-
-      }
+      };
       req.session.user_id = newId;
     }
   }
@@ -125,7 +135,8 @@ app.get('/login', (req, res) => {
   let currentUser = req.session.user_id;
   let templateVars = {
     user: users[currentUser],
-    urls: urlDatabase };
+    urls: urlDatabase
+  };
   res.render('urls_login', templateVars);
 });
 
@@ -135,10 +146,11 @@ app.post('/login', (req, res) => {
   let loginEmail = req.body.email;
   let loginPassword = req.body.password;
   let templateVars = {
-      user: users[currentUser] };
+    user: users[currentUser]
+  };
   // getUserID returns a string, the userID for the user if email matches with the database
   let userID = helpers.getUserID(users, loginEmail);
-  if(!userID) {
+  if (!userID) {
     // displays error page of non existing account to client
     res.render('urls_no_account', templateVars);
   } else if (!bcrypt.compareSync(loginPassword, users[userID].password)) {
@@ -160,7 +172,7 @@ app.post('/logout', (req, res) => {
 // checks to see if shortURL is under client's account, deletes if it is and sends 403 if not
 app.post('/urls/:shortURL/delete', (req, res) => {
   console.log(urlDatabase[req.params.shortURL]);
-  if(urlDatabase[req.params.shortURL].getUserID === req.session.user_id) {
+  if (urlDatabase[req.params.shortURL].getUserID === req.session.user_id) {
     delete urlDatabase[req.params.shortURL];
     res.redirect('/urls');
   } else {
@@ -170,11 +182,12 @@ app.post('/urls/:shortURL/delete', (req, res) => {
 
 // renders page to create new url link, redirects to
 app.get('/urls/new', (req, res) => {
-  if(req.session.user_id) {
+  if (req.session.user_id) {
     let currentUser = req.session.user_id;
     let templateVars = {
       user: users[currentUser],
-      urls: urlDatabase };
+      urls: urlDatabase
+    };
     res.render("urls_new", templateVars);
   } else {
     res.redirect('/login');
@@ -183,33 +196,35 @@ app.get('/urls/new', (req, res) => {
 });
 
 app.get('/urls/:shortURL', (req, res) => {
-  if(urlDatabase[req.params.shortURL]) {
+  if (urlDatabase[req.params.shortURL]) {
     let currentUser = req.session.user_id;
     let templateVars = {
       user: users[currentUser],
       shortURL: req.params.shortURL,
       longURL: urlDatabase[req.params.shortURL].longURL,
-      userID: urlDatabase[req.params.shortURL].userID };
+      userID: urlDatabase[req.params.shortURL].userID
+    };
     res.render("urls_show", templateVars);
   } else {
     let currentUser = req.session.user_id;
     let templateVars = {
-        user: users[currentUser]
+      user: users[currentUser]
     };
     res.render("urls_not_found", templateVars);
   }
 });
 
 app.post('/urls/:shortURL', (req, res) => {
-  if(req.params.shortURL) {
+  if (req.params.shortURL) {
     let currentUser = req.session.user_id;
-    if(currentUser === urlDatabase[req.params.shortURL].userID) {
+    if (currentUser === urlDatabase[req.params.shortURL].userID) {
       urlDatabase[req.params.shortURL].longURL = req.body.longURL;
       let templateVars = {
         user: users[currentUser],
         shortURL: req.params.shortURL,
         longURL: urlDatabase[req.params.shortURL].longURL,
-        userID: urlDatabase[req.params.shortURL].userID };
+        userID: urlDatabase[req.params.shortURL].userID
+      };
       res.render("urls_show", templateVars);
     } else {
       res.status(403).send('You are not the owner of the short URL');
@@ -217,7 +232,7 @@ app.post('/urls/:shortURL', (req, res) => {
   } else {
     let currentUser = req.session.user_id;
     let templateVars = {
-        user: users[currentUser]
+      user: users[currentUser]
     };
     res.render("urls_not_found", templateVars);
   }
@@ -227,6 +242,6 @@ app.get('/urls.json', (req, res) => {
   res.json(urlDatabase);
 });
 
-app.listen(PORT,'0.0.0.0', () => {
+app.listen(PORT, '0.0.0.0', () => {
   console.log(`Tinyapp server listening on port ${PORT}!`);
 });

@@ -36,26 +36,26 @@ TinyApp is a full stack web application built with Node and Express that allows 
 #### GET /
 
 - if user is logged in:
-  (Minor) redirect to /urls
+  (Minor) redirect to /urls ✔
 - if user is not logged in:
-  (Minor) redirect to /login
+  (Minor) redirect to /login ✔
 
 #### GET /urls
 - if user is logged in:
   returns HTML with:
-  the site header (see Display Requirements above)
+  the site header (see Display Requirements above) ✔
 - a list (or table) of URLs the user has created, each list item containing:
-  a short URL
-  the short URL's matching long URL
-  an edit button which makes a GET request to /urls/:id
-  a delete button which makes a POST request to /urls/:id/delete
+  a short URL ✔
+  the short URL's matching long URL ✔
+  an edit button which makes a GET request to /urls/:id ✔
+  a delete button which makes a POST request to /urls/:id/delete ✔
 
 - (Stretch) the date the short URL was created
 - (Stretch) the number of times the short URL was visited
 - (Stretch) the number number of unique visits for the short URL
-- (Minor) a link to "Create a New Short Link" which makes a GET request to /urls/new
+- (Minor) a link to "Create a New Short Link" which makes a GET request to /urls/new ✔
 - if user is not logged in:
-  returns HTML with a relevant error message
+  returns HTML with a relevant error message ✔
 
 #### GET /urls/new
 - if user is logged in:
