@@ -90,6 +90,9 @@ app.post('/urls/new', (req, res) => {
 // renders register page on get request
 app.get('/register', (req, res) => {
   let currentUser = req.session.user_id;
+  if(currentUser) {
+    res.redirect('/urls');
+  }
   let templateVars = {
     user: users[currentUser],
     urls: urlDatabase
@@ -133,6 +136,9 @@ app.post('/register', (req, res) => {
 // renders the login page for the client
 app.get('/login', (req, res) => {
   let currentUser = req.session.user_id;
+  if(currentUser) {
+    res.redirect('/urls');
+  }
   let templateVars = {
     user: users[currentUser],
     urls: urlDatabase
@@ -176,7 +182,7 @@ app.post('/urls/:shortURL/delete', (req, res) => {
     delete urlDatabase[req.params.shortURL];
     res.redirect('/urls');
   } else {
-    res.status(403).send("You do not own this shortURL");
+    res.status(403).send("You do not own this shortURL or not logged in!");
   }
 });
 
@@ -225,9 +231,9 @@ app.post('/urls/:shortURL', (req, res) => {
         longURL: urlDatabase[req.params.shortURL].longURL,
         userID: urlDatabase[req.params.shortURL].userID
       };
-      res.render("urls_show", templateVars);
+      res.redirect('/urls');
     } else {
-      res.status(403).send('You are not the owner of the short URL');
+      res.status(403).send('You are not the owner of the short URL or not logged in!');
     }
   } else {
     let currentUser = req.session.user_id;
