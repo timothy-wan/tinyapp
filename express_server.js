@@ -1,52 +1,48 @@
 const express = require('express');
 const app = express();
 const cookieSession = require('cookie-session');
-const PORT = 8080; // default port 8080
+const PORT = 8080;
 const morgan = require('morgan');
+// separated helper functions to a separate module
 const helpers = require('./functions');
 const bcrypt = require('bcrypt');
 
-const urlDatabase = {
-  'b2xVn2': {longURL: 'http://www.lighthouselabs.ca', userID: 'userRandomID'},
-  '9sm5xK': {longURL: 'http://www.google.com', userID: 'userRandomID'}
-};
-
-const testPass1 = bcrypt.hashSync('1', 10);
-const testPass2 = bcrypt.hashSync('2', 10);
-
-const users = {
-  'userRandomID': {
-    id: 'userRandomID',
-    email: 'user@example.com',
-    password: testPass1
-  },
- 'user2RandomID': {
-    id: 'user2RandomID',
-    email: 'user2@example.com',
-    password: testPass2
-  }
-};
+const urlDatabase = {};
+const users = {};
 
 const bodyParser = require('body-parser');
 
 app.set('view engine', 'ejs');
-app.use(bodyParser.urlencoded({extended: true}));
-app.use(cookieSession({
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(cookieSession( {
   keys: ['user_id']
 }));
 app.use(morgan('dev'));
 
+// takes client to home page ('/urls')
 app.get('/', (req, res) => {
   res.redirect('/urls');
 });
 
+// redirects the client to the longURL
 app.get('/u/:shortURL', (req, res) => {
-  const longURL = urlDatabase[req.params.shortURL].longURL;
-  res.redirect(longURL);
+  let currentUser = req.session.user_id;
+  let templateVars = {
+    user : users[currentUser]
+  }
+  if(urlDatabase[req.params.shortURL]) {
+    const longURL = urlDatabase[req.params.shortURL].longURL;
+    res.redirect(longURL);
+  } else {
+    res.render('urls_not_found', templateVars);
+  }
+
 });
 
+// renders index page on get request
 app.get('/urls', (req, res) => {
   let currentUser = req.session.user_id;
+  // urlsForUser returns obj list containing URLs that belong to current user
   let userURLs = helpers.urlsForUser(urlDatabase, currentUser);
   let templateVars = {
     user: users[currentUser],
@@ -54,16 +50,20 @@ app.get('/urls', (req, res) => {
   res.render('urls_index', templateVars);
 });
 
+// creates a new short url on post request if the user is logged in, if posting without user auth, redirects back to /urls to tell user to log in
 app.post('/urls/new', (req, res) => {
   if(req.session.user_id) {
-    if(req.body.longURL) {                    //make sure user is logged in and received input
+    // make sure user is logged in and received input
+    if(req.body.longURL) {
+      // generateStr() returns a 6 length string that was randomly generated
       let newShortURL = helpers.generateStr();
-      if(urlDatabase[newShortURL]) {          //make sure there isnt an existing short URL with the same random string
+      // make sure there isnt an existing short URL with the same random string
+      if(urlDatabase[newShortURL]) {
         newShortURL = helpers.generateStr();
       } else {
         urlDatabase[newShortURL] = {
           longURL: req.body.longURL,
-          userID: req.session.user_id}
+          userID: req.session.user_id };
       }
       res.redirect(`/urls/${newShortURL}`);
     } else {
@@ -74,10 +74,11 @@ app.post('/urls/new', (req, res) => {
       res.render("urls_new", templateVars);
     }
   } else {
-    res.status(403).send('Please register or login before trying to add a new URL');
+    res.redirect('/urls');
   }
 });
 
+// renders register page on get request
 app.get('/register', (req, res) => {
   let currentUser = req.session.user_id;
   let templateVars = {
@@ -86,6 +87,7 @@ app.get('/register', (req, res) => {
   res.render('urls_registration', templateVars);
 });
 
+// creates an user account in the database on post request, no prior user auth checked.
 app.post('/register', (req, res) => {
   let currentUser = req.session.user_id;
   let templateVars = {
@@ -93,11 +95,16 @@ app.post('/register', (req, res) => {
   let newId = helpers.generateStr();
   let newEmail = req.body.email;
   let newPassword = bcrypt.hashSync(req.body.password, 10);
+  // make sure some input is received
   if(!newEmail || !newPassword) {
+  //
     res.render('urls_empty_fields', templateVars);
+  // renders the email error page if an prior account with same email is found
+  // emailCheck returns boolean value to check if entered email is already in user database
   } else if(helpers.emailCheck(users, newEmail)) {
     res.render('urls_email', templateVars);
   } else {
+  // make sure there isn't duplicate user ids
     if(users[newId]) {
       newId = helpers.generateStr();
     } else {
@@ -113,6 +120,7 @@ app.post('/register', (req, res) => {
   res.redirect('/urls');
 });
 
+// renders the login page for the client
 app.get('/login', (req, res) => {
   let currentUser = req.session.user_id;
   let templateVars = {
@@ -121,16 +129,20 @@ app.get('/login', (req, res) => {
   res.render('urls_login', templateVars);
 });
 
+// on post request to /login, checks if inputted email exists, and if so checks if entered password matches the hashed password from registation, redirects the client to home page on completion and to error pages if bad request were made
 app.post('/login', (req, res) => {
   let currentUser = req.session.user_id;
   let loginEmail = req.body.email;
   let loginPassword = req.body.password;
   let templateVars = {
       user: users[currentUser] };
+  // getUserID returns a string, the userID for the user if email matches with the database
   let userID = helpers.getUserID(users, loginEmail);
   if(!userID) {
+    // displays error page of non existing account to client
     res.render('urls_no_account', templateVars);
   } else if (!bcrypt.compareSync(loginPassword, users[userID].password)) {
+    // displays error page if passwords do not match
     res.render('urls_input_error', templateVars);
   } else {
     req.session.user_id = userID;
@@ -138,12 +150,14 @@ app.post('/login', (req, res) => {
   }
 });
 
+// clears user's cookies on log out
 app.post('/logout', (req, res) => {
   res.clearCookie('express:sess');
   res.clearCookie('express:sess.sig');
   res.redirect('/urls');
 });
 
+// checks to see if shortURL is under client's account, deletes if it is and sends 403 if not
 app.post('/urls/:shortURL/delete', (req, res) => {
   console.log(urlDatabase[req.params.shortURL]);
   if(urlDatabase[req.params.shortURL].getUserID === req.session.user_id) {
@@ -154,6 +168,7 @@ app.post('/urls/:shortURL/delete', (req, res) => {
   }
 });
 
+// renders page to create new url link, redirects to
 app.get('/urls/new', (req, res) => {
   if(req.session.user_id) {
     let currentUser = req.session.user_id;
@@ -183,7 +198,6 @@ app.get('/urls/:shortURL', (req, res) => {
     };
     res.render("urls_not_found", templateVars);
   }
-
 });
 
 app.post('/urls/:shortURL', (req, res) => {
