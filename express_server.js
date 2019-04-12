@@ -201,6 +201,7 @@ app.get('/urls/new', (req, res) => {
 
 });
 
+// gets shortURL data if user is logged in, if shortURL is not in database, renders a not found page for client
 app.get('/urls/:shortURL', (req, res) => {
   if (urlDatabase[req.params.shortURL]) {
     let currentUser = req.session.user_id;
@@ -220,6 +221,7 @@ app.get('/urls/:shortURL', (req, res) => {
   }
 });
 
+// remaps shortURL redirection to a new longURL specified by client, checks to make sure client owns the shortURL link, shows errors pages if user auth failed or shortURL does not exist
 app.post('/urls/:shortURL', (req, res) => {
   if (req.params.shortURL) {
     let currentUser = req.session.user_id;

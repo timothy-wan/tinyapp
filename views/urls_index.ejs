@@ -11,22 +11,19 @@
 <body style="font-size:20px; padding:50px;">
   <% include partials/_header %>
   <% if(user) { %>
-    <div>
-      <h2>Hello <%= user.email %>! </h2>
-    </div>
     <div class='px-5 m-0 bg-light border rounded float-center text-center clearfix'>
       <h3>My URLs</h3>
     </div>
     <div class="shadow p-3 mb-5 bg-white rounded p-5 m-5">
       <% if(urls)  { %>
       <% for(keyURL in urls) { %>
-          <div class="card col-lg-10" style="width: 18rem;">
-            <div class="card-body m-0">
+          <div class="card border-0 d-inline col-lg-6">
+            <div class="card-body">
               <a href="./u/<%= keyURL %>" class="card-title" > <%= keyURL %> </a>
               <h6 class="card-subtitle mb-2 text-muted">Mapped to <%= urls[keyURL].longURL%></h6>
-              <a href="/urls/<%= keyURL%>" class="card-link col-lg 6">Edit</a>
+              <a href="/urls/<%= keyURL%>" class="card-link d-inline">Edit</a>
               <form class="card-link" method="POST" action="/urls/<%=keyURL%>/delete">
-                  <button type="submit" class="btn btn-primary col-lg-6">Delete</button>
+                  <button type="submit" class="btn btn-primary d-inline">Delete</button>
               </form>
            </div>
           </div>

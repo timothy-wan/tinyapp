@@ -28,3 +28,9 @@
 
 <div class="d-block p-2 m-5 bg-dark">
 </div>
+
+<% if(user) { %>
+  <div>
+    <h2>Hello <%= user.email %>! </h2>
+  </div>
+<% } %>
