@@ -128,7 +128,7 @@ app.post('/register', (req, res) => {
   let newEmail = req.body.email;
   let newPassword = bcrypt.hashSync(req.body.password, 10);
   // make sure some input is received
-  if (!newEmail || !newPassword) {
+  if (!newEmail || !req.body.password) {
     //
     res.render('urls_empty_fields', templateVars);
     // renders the email error page if an prior account with same email is found
